@@ -61,8 +61,6 @@ types:
         type: u1
       - id: payload
         type: payload
-      - id: random_paddin
-        size-eos: true
 
   # Payload of the message.
   payload:
@@ -84,9 +82,9 @@ types:
   encrypted_data:
     seq:
       - id: encrypted_message
-        size: _root.ssh_banner_or_packet_length
+        size: _root.ssh_banner_or_packet_length-2
       - id: mac
-        size-eos: true
+        size: 16
 
   # Payload for exchanging of keys: client init.
   key_exchange_init:
@@ -147,10 +145,14 @@ types:
         type: u1
       - id: reserved_for_future_extension
         type: u4
+      - id: random_padding
+        size: _parent._parent.padding_length
   
   # SSH message for exhanging new keys.
   key_exchange_new_keys:
-    seq: []
+    seq:
+      - id: random_padding
+        size: _parent._parent.padding_length
 
   # Diffie helman algorithm init.
   diffie_helman_init:
@@ -159,6 +161,8 @@ types:
         type: u4
       - id: e
         size: multi_precision_integer_length
+      - id: random_padding
+        size: _parent._parent.padding_length
   
   # Diffie helman algorithm reply.
   diffie_helman_reply:
@@ -189,6 +193,8 @@ types:
         type: u4
       - id: signature_of_h
         size: signature_of_h_length
+      - id: random_padding
+        size: _parent._parent.padding_length
 
   # List of algorithms for key exchange.
   algorithm_list:
