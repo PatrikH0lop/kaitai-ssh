@@ -47,7 +47,7 @@ byte[n1]  payload; n1 = packet_length - padding_length - 1
 byte[n2]  random padding; n2 = padding_length
 byte[m]   mac (Message Authentication Code - MAC); m = mac_length
 ```
-A corresponding type in Kaitai parser is `ssh_packet`. Packet length does not take into account sequence `mac` or the field `packet_length` itself. Payload has a corresponding type `payload`. `Random padding` and `mac` are parsed as a part of payload (See section [Encrypted packets](TODO)). Payload further specifies `message_number` that is used to differentiate between types of messages ([RFC](https://tools.ietf.org/html/rfc4253#section-12)). For this purpose is used Kaitai enum `message_numbers`.
+A corresponding type in Kaitai parser is `ssh_packet`. Packet length does not take into account sequence `mac` or the field `packet_length` itself. Payload has a corresponding type `payload`. `Random padding` and `mac` are parsed as a part of payload (See section **Encrypted packets**). Payload further specifies `message_number` that is used to differentiate between types of messages ([RFC](https://tools.ietf.org/html/rfc4253#section-12)). For this purpose is used Kaitai enum `message_numbers`.
 
 ##### SSH version exchange vs SSH packet
 Kaitai is a tool designed for non-ambiquos data structures. Since SSH identification string and other packets have completely different structure and there is no common field that will specify the type of message, stateless parser does not know whether is parses one or the other. That's why the first 4 bytes of the parsed sequence is called `ssh_banner_or_packet_length`. If this field contains value `SSH-`, parser expects that it is an identification string, otherwise packet length of SSH packet.
