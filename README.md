@@ -18,12 +18,12 @@ Another used resources was an [overview of SSH structure for traffic analysis](h
 
 ##### Versions
 
-This project is able to parse protocol messages for SSHv2.<br>
+This parser (`parser.ksy`) is able to parse protocol messages for SSHv2.<br>
 *Based on RFC: "Earlier versions of this protocol have not been formally documented."* This means that we would be unable to create a formal parser for previous versions.
 
 #### Parser
 
-*Disclaimer: Examples provided by official pages of Kaitai Struct do not contain direct examples of SSH protocol except parsing of [SSH public keys](https://formats.kaitai.io/ssh_public_key/index.html), which was not goal of this project and the parser was inspired by an existing project.*
+*Disclaimer: Examples provided by official pages of Kaitai Struct do not contain direct examples of SSH protocol except parsing of [SSH public keys](https://formats.kaitai.io/ssh_public_key/index.html), which was not goal of this project and the parser was NOT inspired by an existing project.*
 
 ##### Metadata information
 Section `meta` contains basic data about the parser, reference to documentation (`xref`), specification of supported file extension  `bin`, encoding, etc.
@@ -39,7 +39,7 @@ Corresponding type in Kaitai parser is `identification_string`. Since `comments`
 
 ##### SSH packet ([RFC](https://tools.ietf.org/html/rfc4253#section-6))
 
-After the exchange of SSH identification string, all messages have the following structure:
+After the exchange of SSH identification strings, all messages have the following structure:
 ```
 uint32    packet_length
 byte      padding_length
@@ -50,12 +50,12 @@ byte[m]   mac (Message Authentication Code - MAC); m = mac_length
 A corresponding type in Kaitai parser is `ssh_packet`. Packet length does not take into account sequence `mac` or the field `packet_length` itself. Payload has a corresponding type `payload`. `Random padding` and `mac` are parsed as a part of payload (See section **Encrypted packets**). Payload further specifies `message_number` that is used to differentiate between types of messages ([RFC](https://tools.ietf.org/html/rfc4253#section-12)). For this purpose is used Kaitai enum `message_numbers`.
 
 ##### SSH version exchange vs SSH packet
-Kaitai is a tool designed for non-ambiquos data structures. Since SSH identification string and other packets have completely different structure and there is no common field that will specify the type of message, stateless parser does not know whether is parses one or the other. That's why the first 4 bytes of the parsed sequence is called `ssh_banner_or_packet_length`. If this field contains value `SSH-`, parser expects that it is an identification string, otherwise packet length of SSH packet.
+Kaitai is a tool designed for non-ambiquos data structures. Since SSH identification string and other packets have completely different structure and there is no common field that will specify the type of message, stateless parser does not know whether is parses one or the other. That's why the first 4 bytes of the parsed sequence is called `ssh_idstring_or_packet_length`. If this field contains value `SSH-`, parser expects that it is an identification string, otherwise packet length of SSH packet.
 
 
 ##### Negotiation of algorithms for key exhange ([RFC](https://tools.ietf.org/html/rfc4253#section-7.1))
 
-The next step is to negotiate algorithms used for key exchange and it has following structure (parser structure name: `key_exchange_init`):
+The next step is to negotiate algorithms used for key exchange and messages have the following structure (parser structure name: `key_exchange_init`):
 ```
       byte         SSH_MSG_KEXINIT
       byte[16]     cookie (random bytes)
@@ -95,7 +95,7 @@ This process is repeated until a message type `SSH_MSG_NEWKEYS` is sent (parser 
 
 ##### Encrypted packets ([RFC](https://tools.ietf.org/html/rfc4253#section-6.3))
 Once both sides have everything needed for an encrypted communication, packets will be encrypted. There are multiple problem for stateless identification of encrypted packets. Since SSH relies heavily on the handshake described in previous section, size of `mac` sequence is unknown for the parser and packet length excludes this sequence. For this purpose parser uses the best guess of `16B` variant, since this value was used for encryption of captured communication.<br>
-For the same reason described in section **SSH version exchange vs SSH packet**, an ambiquous design of SSH messages forces our to quess which packets are encrypted. The encrypted payload begins immediatelly after the packet length, which breaks the general SSH packet structure. This is fixed by determination the message type. If the value is not recognized (enum `message_types`), it is considered as the encrypted packet. That is why padding length and message number represent a part of encrypted payload in the mentioned case.
+For the same reason described in section **SSH version exchange vs SSH packet**, an ambiquous design of SSH messages forces the parser to quess which packets are encrypted. The encrypted payload begins immediatelly after the packet length, which breaks the general SSH packet structure. This is fixed by determination of the message type via heuristic. If the first value after `packet_length` is not recognized as a valid message type (enum `message_types`), it is considered to be an encrypted packet. That is why padding length and message number represent a part of encrypted payload in the mentioned case.
 
 ##### Disconnection messages ([RFC](https://tools.ietf.org/html/rfc4253#section-11.1))
 
@@ -158,9 +158,9 @@ Reserved or unimplemented messages are sent if the message is not recognized but
 
 #### Dataset description
 
-Dataset represented captured network communication is located in the folder `data`.
+Dataset representing captured network communication is located in the folder `data`.
 
-Many of the below-mentioned files are part of the following communication: `communication.pcapng `
+Many of the below-mentioned files are part of the following communication: `data/communication.pcapng `
 
 Dataset files:
 - `1_client_protocol.bin`, `1_client_protocol.pcap` <br>
