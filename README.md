@@ -155,3 +155,44 @@ Reserved or unimplemented messages are sent if the message is not recognized but
 
 ![](images/ssh_encrypted_packet.png)
 
+
+#### Dataset description
+
+Dataset represented captured network communication is located in the folder `data`.
+
+Many of the below-mentioned files are part of the following communication: `communication.pcapng `
+
+Dataset files:
+- `1_client_protocol.bin`, `1_client_protocol.pcap` <br>
+  SSH identification string of the client
+- `1_client_protocol_with_comment.bin` <br>
+  SSH identification string containing custom comment. Manually crafted file.
+- `2_server_protocol.bin`, `2_server_protocol.pcap` <br>
+  SSH identification string of the server.
+- `3_client_key_exchange_init.bin`, `3_client_key_exchange_init.pcap` <br>
+  Client initiation of key exchange.
+- `4_server_key_exchange_init.bin`, `4_server_key_exchange_init.pcap` <br>
+  Server's response to client initiation request.
+- `5_client_diffie_helman.bin`, `5_client_diffie_helman.pcap` <br>
+  Client initiation of Diffie-Hellman key exchange.
+- `6_server_diffie_hellman_key_exchange_reply.bin`, `6_server_diffie_hellman_key_exchange_reply.pcap` <br>
+  Servers response to DH key exchange.
+- `6_1_server_diffie_hellman_key_exchange_reply.bin` <br>
+  Servers response to DH key exchange, alternative values.
+- `6_2_new_keys.bin`, `6_server_diffie_hellman_key_exchange_reply.pcap` <br>
+  Servers response with new keys.
+- `7_client_new_keys.bin`, `7_client_new_keys.pcap` <br>
+  Client new keys message.
+- `8_client_encrypted_packet.bin`, `8_client_encrypted_packet.pcap` <br>
+  Encrypted message sent by client.
+- `9_server_encrypted_packet.bin`, `9_server_encrypted_packet.pcap` <br>
+  Encrypted message sent by server.
+- `ssh_debug_msg.bin` <br>
+  SSH debug message, manually crafted.
+- `ssh_disconnection_msg.bin` <br>
+  SSH disconnection message, manually crafted.
+- `ssh_unimplemented_msg.bin` <br>
+  SSH reservation message, manually crafted.
+
+Streams:
+- Folder `data/streams` contain binary streams of multiple messages. Each file from `comm.bin` to `comm9.bin` contains the whole binary stream except the previously parsed messages, so `comm.bin` contains the whole communication and `comm9.bin` only the last left message.
