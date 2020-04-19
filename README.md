@@ -95,4 +95,63 @@ This process is repeated until a message type `SSH_MSG_NEWKEYS` is sent (parser 
 
 ##### Encrypted packets ([RFC](https://tools.ietf.org/html/rfc4253#section-6.3))
 Once both sides have everything needed for an encrypted communication, packets will be encrypted. There are multiple problem for stateless identification of encrypted packets. Since SSH relies heavily on the handshake described in previous section, size of `mac` sequence is unknown for the parser and packet length excludes this sequence. For this purpose parser uses the best guess of `16B` variant, since this value was used for encryption of captured communication.<br>
-For the same reason described in section **SSH version exchange vs SSH packet**, an ambiquous design of SSH messages forces our to quess which packets are encrypted. This is done by determination the message type. If the value is not recognized (enum `message_types`), it is considered as the encrypted packet.
+For the same reason described in section **SSH version exchange vs SSH packet**, an ambiquous design of SSH messages forces our to quess which packets are encrypted. The encrypted payload begins immediatelly after the packet length, which breaks the general SSH packet structure. This is fixed by determination the message type. If the value is not recognized (enum `message_types`), it is considered as the encrypted packet. That is why padding length and message number represent a part of encrypted payload in the mentioned case.
+
+##### Disconnection messages ([RFC](https://tools.ietf.org/html/rfc4253#section-11.1))
+
+At any time, any side of the communication can send a disconnection message in the following format:
+```
+byte      SSH_MSG_DISCONNECT
+uint32    reason code
+string    description in ISO-10646 UTF-8 encoding [RFC3629]
+string    language tag [RFC3066]
+```
+
+All strings end with an empty byte. Because disconnection messages are very rarely sent in an unencrypted communication, this feature was tested on manually crafted binary files.
+
+##### Debug and reserved messages ([RFC](https://tools.ietf.org/html/rfc4253#section-11.3))
+
+Debug messages (parser type `msg_debug`) can be sent for various debugging purposes and have the following structure:
+```
+byte      SSH_MSG_DEBUG
+boolean   always_display
+string    message in ISO-10646 UTF-8 encoding [RFC3629]
+string    language tag [RFC3066]
+```
+
+Reserved or unimplemented messages are sent if the message is not recognized but may have various use cases in the future. For this type of messages parser uses type `msg_unimplemented`). 
+
+#### Examples of parsed messages
+
+##### SSH identification string
+
+![](images/ssh_id_string.png)
+
+##### SSH key exchange init
+
+![](images/ssh_key_exchange_init_1.png)
+
+##### SSH Diffie Hellman
+
+![](images/ssh_server_diffie_hellman.png)
+
+##### SSH new keys
+
+![](images/ssh_new_keys.png)
+
+##### SSH disconnection message
+
+![](images/ssh_disconnect_msg.png)
+
+##### SSH debug message
+
+![](images/ssh_debug_msg.png)
+
+##### SSH unimplemented message
+
+![](images/ssh_unimplemented_msg.png)
+
+##### SSH encrypted packet
+
+![](images/ssh_encrypted_packet.png)
+

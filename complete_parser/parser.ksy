@@ -78,6 +78,9 @@ types:
             'message_numbers::ssh_msg_newkeys': key_exchange_new_keys
             'message_numbers::ssh_msg_kexdh_init': diffie_helman_init
             'message_numbers::ssh_msg_kexdg_reply': diffie_helman_reply
+            'message_numbers::ssh_msg_disconnect': msg_disconnect
+            'message_numbers::ssh_msg_debug': msg_debug
+            'message_numbers::ssh_msg_unimplemented': msg_unimplemented
             _: encrypted_data
 
   # Encrypted payload.
@@ -208,6 +211,48 @@ types:
         eos-error: false
         repeat: eos
 
+  # Disconnection message.
+  msg_disconnect:
+    seq:
+      - id: reason_code
+        type: u4
+        enum: disconnection_message
+      - id: description
+        type: str
+        encoding: utf-8
+        terminator: 0x00
+      - id: language_tag
+        type: str
+        encoding: utf-8
+        terminator: 0x00
+      - id: random_padding
+        size: _parent._parent.padding_length
+
+  # SSH debug messages.
+  msg_debug:
+    seq:
+      - id: always_display
+        type: u1
+      - id: description
+        type: str
+        encoding: utf-8
+        terminator: 0x00
+      - id: language_tag
+        type: str
+        encoding: utf-8
+        terminator: 0x00
+      - id: random_padding
+        size: _parent._parent.padding_length
+
+  # SSH unimplemented messages.
+  msg_unimplemented:
+    seq:
+      - id: packet_sequence_of_rejected_message
+        type: u4
+      - id: random_padding
+        size: _parent._parent.padding_length
+
+
 enums:
   # SSH message variants.
   message_numbers:
@@ -221,4 +266,22 @@ enums:
     21: ssh_msg_newkeys
     30: ssh_msg_kexdh_init
     31: ssh_msg_kexdg_reply
+
+  # SSH disconnection variants.
+  disconnection_message:
+    1: ssh_disconnect_host_not_allowed_to_connect
+    2: ssh_disconnect_protocol_error
+    3: ssh_disconnect_key_exchange_failed
+    4: ssh_disconnect_reserved
+    5: ssh_disconnect_mac_error
+    6: ssh_disconnect_compression_error
+    7: ssh_disconnect_not_available
+    8: ssh_disconnect_version_not_supported
+    9: ssh_disconnect_key_not_verifiable
+    10: ssh_disconnect_connection_lost
+    11: ssh_disconnect_by_application
+    12: ssh_disconnect_too_many_connections
+    13: ssh_disconnect_auth_cancelled_by_user
+    14: ssh_disconnect_auth_methods_available
+    15: ssh_disconnect_illegal_user_name
 
