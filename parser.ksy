@@ -1,6 +1,6 @@
 meta:
   id: ssh_parser
-  title: SSH protocol parser by Patrik Holop (xholop01).
+  title: SSH protocol parser by Patrik Holop.
   file-extension: bin
   endian: be
   ks-opaque-types: true
