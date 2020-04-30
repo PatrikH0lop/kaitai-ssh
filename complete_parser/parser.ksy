@@ -15,30 +15,35 @@ doc-ref: https://tools.ietf.org/html/rfc4253
 seq:
   # Type of the message, either ssh identification string
   # or SSH packet.
-  - id: ssh_banner_or_packet_length
+  - id: ssh_idstring_or_packet_length
     type: b32
   - id: body
     type:
-      switch-on: ssh_banner_or_packet_length
+      switch-on: ssh_idstring_or_packet_length
       cases:
         # '[0x53, 0x53, 0x48, 0x2d]' is SSH banner.
-        0x5353482D: id_banner
+        0x5353482D: identification_string
         _: ssh_packet
 
 
 types:
   # SSH identification string.
-  id_banner:
+  identification_string:
     seq:
     - id: protoversion
       type: str
       encoding: utf-8
       terminator: 0x2d
     - id: additional_information
-      terminator: 0x0a
-      type: additional_ssh_banner_data
+      terminator: 0x0d
+      consume: false
+      type: additional_ssh_id_string_data
+    - id: cr
+      contents: [0x0d]
+    - id: lf
+      contents: [0x0a]
 
-  additional_ssh_banner_data:
+  additional_ssh_id_string_data:
     seq:
       - id: softwareversion
         terminator: 0x20
@@ -50,9 +55,6 @@ types:
         encoding: utf-8
         terminator: 0x0a
         size-eos: true
-      - id: last_char
-        type: u1
-        type: 0x0a
 
   # SSH packet.
   ssh_packet:
@@ -82,7 +84,7 @@ types:
   encrypted_data:
     seq:
       - id: encrypted_message
-        size: _root.ssh_banner_or_packet_length-2
+        size: _root.ssh_idstring_or_packet_length-2
       - id: mac
         size: 16
 
