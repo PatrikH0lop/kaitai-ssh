@@ -9,7 +9,7 @@ The goal of this project is to create a parser of SSH protocol messages using Ka
 ##### SSH protocol
 Structure of SSH protocol messages is described in [RFC 4253](https://tools.ietf.org/html/rfc4253).<br>
 More precise documentation for SSH ranges from [RFC 4250](https://tools.ietf.org/html/rfc4250) to [RFC 4256](https://tools.ietf.org/html/rfc4256).<br>
-Another used resources was an [overview of SSH structure for traffic analysis](https://www.trisul.org/blog/traffic-analysis-of-secure-shell-ssh/).
+Another used resource was an [overview of SSH structure for traffic analysis](https://www.trisul.org/blog/traffic-analysis-of-secure-shell-ssh/).
 
 ##### Kaitai
 
